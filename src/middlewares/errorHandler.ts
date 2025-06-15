@@ -1,4 +1,5 @@
 import { ErrorRequestHandler } from 'express';
+import { isHttpError } from 'http-errors';
 
 export const errorHandler: ErrorRequestHandler = async (
   err,
@@ -6,11 +7,12 @@ export const errorHandler: ErrorRequestHandler = async (
   res,
   next,
 ) => {
-  const status = err.status || 500;
+  const status = isHttpError(err) ? err.status : 500;
+  const message = isHttpError(err) ? err.message : 'Something went wrong';
 
   res.status(status).json({
     status,
-    message: 'Something went wrong',
+    message,
     data: err.message,
   });
 };
